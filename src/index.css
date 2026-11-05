@@ -6,35 +6,99 @@
   body {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #1e293b;
-    background-color: #f8faf8;
+    background-color: #f6faf6;
+    overflow-x: hidden;
   }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f0fdf4;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: #86efac;
+  border-radius: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #22c55e;
+}
+
+/* Farm-Themed Geometric Backgrounds & Patterns */
+.bg-farm-pattern {
+  background-color: #f6faf6;
+  background-image: 
+    radial-gradient(#10b981 0.75px, transparent 0.75px),
+    radial-gradient(#22c55e 0.75px, #f6faf6 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  background-opacity: 0.15;
+}
+
+.bg-farm-mesh {
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+    #f8faf8;
+}
+
+.bg-hero-glow {
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.25), transparent),
+    radial-gradient(ellipse 60% 40% at 85% 60%, rgba(245, 158, 11, 0.15), transparent),
+    radial-gradient(ellipse 50% 30% at 15% 70%, rgba(14, 165, 233, 0.15), transparent);
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.glass-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(16, 185, 129, 0.18), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+  border-color: rgba(52, 211, 153, 0.5);
+}
+
+.glass-card-dark {
+  background: linear-gradient(135deg, rgba(11, 36, 24, 0.92) 0%, rgba(19, 78, 52, 0.94) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+/* Animated gradient text */
+.text-gradient-farm {
+  background: linear-gradient(135deg, #065f46 0%, #059669 45%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-sun {
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Pulsing radar animation for demo sensor beacons */
 @keyframes sensor-pulse {
   0% {
     transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8);
   }
   70% {
     transform: scale(1);
-    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
   }
   100% {
     transform: scale(0.95);
@@ -44,4 +108,21 @@
 
 .animate-sensor-pulse {
   animation: sensor-pulse 2s infinite;
+}
+
+/* Laser scan line effect */
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #34d399, #10b981, #f59e0b, transparent);
+  box-shadow: 0 0 15px #34d399, 0 0 30px #10b981;
+  animation: scanBeam 2.5s ease-in-out infinite;
+}
+
+@keyframes scanBeam {
+  0% { top: 4%; opacity: 0.8; }
+  50% { top: 94%; opacity: 1; }
+  100% { top: 4%; opacity: 0.8; }
 }
