@@ -22,8 +22,8 @@ export const StatCard: React.FC<StatCardProps> = ({
   value,
   subtitle,
   icon: Icon,
-  iconBgColor = 'bg-emerald-50',
-  iconColor = 'text-emerald-700',
+  iconBgColor = 'bg-lime-accent/15',
+  iconColor = 'text-lime-accent',
   trend,
   onClick,
   badge,
@@ -31,43 +31,39 @@ export const StatCard: React.FC<StatCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm transition-all duration-200 hover:shadow-md ${
-        onClick ? 'cursor-pointer hover:border-emerald-300' : ''
+      className={`rounded-2xl noir-card p-5 border border-noir-700/80 shadow-noir-card transition-all duration-200 hover:-translate-y-1 hover:border-lime-accent/40 ${
+        onClick ? 'cursor-pointer hover:shadow-glow-lime' : ''
       }`}
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-ivory-400">
               {title}
             </span>
             {badge && (
-              <span className="text-[10px] font-medium bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-lime-accent/15 text-lime-glow border border-lime-accent/30">
                 {badge}
               </span>
             )}
           </div>
-          <div className="text-2xl font-bold text-slate-800 tracking-tight">
+          <div className="text-2xl sm:text-3xl font-mono font-extrabold text-ivory-100 tracking-tight">
             {value}
           </div>
+          {subtitle && <p className="text-xs text-ivory-400 font-mono">{subtitle}</p>}
         </div>
-        <div className={`p-3 rounded-xl ${iconBgColor}`}>
-          <Icon className={`w-5 h-5 ${iconColor}`} />
+
+        <div className={`p-3 rounded-xl border border-noir-700 ${iconBgColor} ${iconColor}`}>
+          <Icon className="w-5 h-5" />
         </div>
       </div>
 
-      {(subtitle || trend) && (
-        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-          {subtitle && <span className="text-slate-500">{subtitle}</span>}
-          {trend && (
-            <span
-              className={`font-medium ${
-                trend.isPositive ? 'text-emerald-600' : 'text-amber-600'
-              }`}
-            >
-              {trend.value} <span className="text-slate-400 font-normal">{trend.label}</span>
-            </span>
-          )}
+      {trend && (
+        <div className="mt-3 pt-3 border-t border-noir-700 flex items-center justify-between text-xs font-mono">
+          <span className={trend.isPositive ? 'text-emerald-bright font-bold' : 'text-amber-solar font-bold'}>
+            {trend.value}
+          </span>
+          {trend.label && <span className="text-ivory-400">{trend.label}</span>}
         </div>
       )}
     </div>

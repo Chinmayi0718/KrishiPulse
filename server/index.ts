@@ -7,8 +7,10 @@ import { createClient } from "@supabase/supabase-js";
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
-const SUPABASE_URL = process.env.SUPABASE_URL || "";
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const ESP32_API_SECRET = process.env.ESP32_API_SECRET || '';
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.warn(
@@ -16,11 +18,14 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   );
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+const supabase = isSupabaseConfigured
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '15mb' }));
 
 // Middleware to verify a farmer's Supabase access token
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
@@ -41,6 +46,7 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
+    if (!supabase) return res.status(503).json({ error: "Supabase is not configured" });
     const { data, error } = await supabase.auth.getUser(token);
 
     if (error || !data.user) {
@@ -64,7 +70,7 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
 
 // Simple health check
 app.get("/api/health", (_req: Request, res: Response) => {
-  res.json({ status: "ok" });
+  res.json({ status: "ok", service: "KrishiPulse", supabaseConfigured: isSupabaseConfigured, geminiConfigured: Boolean(GEMINI_API_KEY) });
 });
 
 // Real farmer registration using Supabase Authentication
@@ -86,6 +92,7 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
       });
     }
 
+    if (!supabase) return res.status(503).json({ error: "Supabase is not configured" });
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
@@ -125,6 +132,7 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
       });
     }
 
+    if (!supabase) return res.status(503).json({ error: "Supabase is not configured" });
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
@@ -512,55 +520,6 @@ app.delete(
   },
 );
 
-// For brevity we expose generic CRUD helper.
-function crud(resource: string) {
-  const router = express.Router();
-  router.use(requireAuth);
-  router.get("/:id", async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { data, error } = await supabase
-      .from(resource)
-      .select("*")
-      .eq("id", id)
-      .single();
-    if (error) return res.status(404).json({ error: error.message });
-    res.json(data);
-  });
-
-  router.post("", async (req: Request, res: Response) => {
-    const { data, error } = await supabase
-      .from(resource)
-      .insert(req.body)
-      .single();
-    if (error) return res.status(500).json({ error: error.message });
-    res.json(data);
-  });
-
-  router.put("/:id", async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { data, error } = await supabase
-      .from(resource)
-      .update(req.body)
-      .eq("id", id)
-      .single();
-    if (error) return res.status(500).json({ error: error.message });
-    res.json(data);
-  });
-
-  router.delete("/:id", async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { error } = await supabase.from(resource).delete().eq("id", id);
-    if (error) return res.status(500).json({ error: error.message });
-    res.json({ success: true });
-  });
-
-  return router;
-}
-
-// Register generic CRUD routers for key resources
-
-// AI Assistant endpoint – uses Gemini if key present
-
 // AI Assistant with authentication and 4 free consultations
 app.post("/api/assistant", requireAuth, async (req: Request, res: Response) => {
   try {
@@ -750,6 +709,59 @@ app.post("/api/assistant", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// Sensor ingestion (real or explicitly simulated data).
+// ESP32_API_SECRET must be configured in the server environment.
+app.post("/api/sensors/readings", async (req: Request, res: Response) => {
+  if (!ESP32_API_SECRET) return res.status(503).json({ error: "Device authentication not configured" });
+  const supplied = req.header("x-device-token") || req.header("authorization")?.replace(/^Bearer /i, "");
+  if (supplied !== ESP32_API_SECRET) return res.status(401).json({ error: "Invalid device token" });
+  const { device_id, zone_id, zone_name, soil_moisture, temperature, humidity, battery_level, is_simulated } = req.body ?? {};
+  const moisture = Number(soil_moisture);
+  if (typeof zone_id !== "string" || !zone_id.trim() || soil_moisture === undefined || !Number.isFinite(moisture) || moisture < 0 || moisture > 100) {
+    return res.status(400).json({ error: "zone_id and soil_moisture (0-100) are required" });
+  }
+  for (const [key, value] of Object.entries({ temperature, humidity, battery_level })) {
+    if (value !== undefined && (typeof value !== "number" || !Number.isFinite(value))) {
+      return res.status(400).json({ error: `Invalid ${key}` });
+    }
+  }
+  if (!supabase) return res.status(503).json({ error: "Supabase is not configured" });
+  const record = {
+    device_id: typeof device_id === "string" && device_id.trim() ? device_id : "ESP32_001",
+    zone_id,
+    zone_name: typeof zone_name === "string" ? zone_name : zone_id,
+    soil_moisture: moisture,
+    temperature: temperature ?? null,
+    humidity: humidity ?? null,
+    battery_level: battery_level ?? null,
+    is_simulated: is_simulated === true,
+    recorded_at: new Date().toISOString(),
+  };
+  const { error } = await supabase.from("sensor_readings").insert(record);
+  if (error) return res.status(500).json({ error: "Failed to save sensor reading" });
+  return res.status(201).json({
+    success: true,
+    reading: record,
+    advisory: {
+      recommendation: moisture < 45 ? "Low moisture: check irrigation needs" : moisture > 85 ? "High moisture: check drainage" : "Monitor moisture",
+      triggerPumpRelay: false, // Advice is NOT an authenticated pump command.
+    },
+  });
+});
+
+// Frontend compatibility: do not fabricate crop diagnoses when AI is unavailable.
+app.post("/api/cropvision/analyze", async (_req: Request, res: Response) => {
+  return res.status(503).json({ error: "Crop image analysis is not yet configured. Restore the ONNX model or implement a verified image-analysis provider." });
+});
+
+// Do not misrepresent static placeholders as verified live feeds.
+app.get("/api/schemes", (_req: Request, res: Response) => {
+  res.json({ success: true, count: 0, schemes: [], live: false, message: "Scheme feed not yet integrated" });
+});
+app.get("/api/mandi", (_req: Request, res: Response) => {
+  res.json({ success: false, prices: [], live: false, message: "Mandi price feed not yet integrated" });
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server listening on http://localhost:${PORT}`);
+  console.log(`KrishiPulse backend listening on http://localhost:${PORT}`);
 });

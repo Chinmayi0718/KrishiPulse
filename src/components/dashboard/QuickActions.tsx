@@ -1,72 +1,76 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ScanLine, Droplets, BotMessageSquare, PlusCircle } from 'lucide-react';
+import { ScanLine, BotMessageSquare, Droplets, Landmark, TrendingUp, CloudSun } from 'lucide-react';
 
 export const QuickActions: React.FC = () => {
   const actions = [
     {
+      to: '/assistant',
+      label: 'Pulse AI Assistant',
+      desc: 'Gemini agronomy chat',
+      icon: BotMessageSquare,
+      color: 'text-lime-accent',
+      border: 'hover:border-lime-accent/40',
+    },
+    {
       to: '/cropvision',
-      label: 'Scan Crop Leaf',
-      desc: 'Simulated AI diagnosis',
+      label: 'Scan Leaf Lesion',
+      desc: 'Multimodal CV diagnosis',
       icon: ScanLine,
-      color: 'from-emerald-700 via-forest-800 to-teal-900',
-      iconBg: 'bg-white/20 text-white',
-      badge: 'Vision AI',
+      color: 'text-emerald-bright',
+      border: 'hover:border-emerald-500/40',
+    },
+    {
+      to: '/schemes',
+      label: 'Schemes Centre',
+      desc: 'Track DBT applications',
+      icon: Landmark,
+      color: 'text-amber-solar',
+      border: 'hover:border-amber-solar/40',
+    },
+    {
+      to: '/mandi',
+      label: 'Mandi APMC Prices',
+      desc: 'Wholesale benchmarks',
+      icon: TrendingUp,
+      color: 'text-lime-glow',
+      border: 'hover:border-lime-accent/40',
     },
     {
       to: '/pulsewater',
-      label: 'Check Soil Moisture',
-      desc: 'Probe sensor mesh',
+      label: 'Irrigation Valve',
+      desc: 'ESP32 solenoid control',
       icon: Droplets,
-      color: 'from-sky-600 via-cyan-700 to-blue-900',
-      iconBg: 'bg-white/20 text-white',
-      badge: 'IoT Sensors',
+      color: 'text-cyan-ice',
+      border: 'hover:border-cyan-moisture/40',
     },
     {
-      to: '/assistant',
-      label: 'Ask AI Agronomist',
-      desc: 'Demo farming advice',
-      icon: BotMessageSquare,
-      color: 'from-teal-700 via-emerald-800 to-green-950',
-      iconBg: 'bg-white/20 text-white',
-      badge: 'Local AI',
-    },
-    {
-      to: '/crops',
-      label: 'Add / View Crops',
-      desc: 'Acreage & harvests',
-      icon: PlusCircle,
-      color: 'from-amber-600 via-orange-700 to-emerald-950',
-      iconBg: 'bg-white/20 text-white',
-      badge: '4.5 Acres',
+      to: '/weather',
+      label: 'Spray Radar',
+      desc: 'Open-Meteo rain alerts',
+      icon: CloudSun,
+      color: 'text-amber-solar',
+      border: 'hover:border-amber-solar/40',
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
       {actions.map((act) => {
         const Icon = act.icon;
         return (
           <Link
-            key={act.label}
+            key={act.to}
             to={act.to}
-            className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${act.color} text-white p-5 shadow-sm hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 group`}
+            className={`p-4 rounded-2xl noir-card border border-noir-700/80 ${act.border} transition-all duration-200 hover:-translate-y-1 shadow-noir-card group text-left`}
           >
-            {/* Subtle glow circle */}
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10 blur-xl group-hover:scale-150 transition-transform pointer-events-none" />
-
-            <div className="flex items-center justify-between mb-3 relative z-10">
-              <div className={`p-3 rounded-2xl ${act.iconBg} backdrop-blur shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform`}>
-                <Icon className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-200 bg-white/15 backdrop-blur px-2.5 py-0.5 rounded-full border border-white/10">
-                {act.badge}
-              </span>
+            <div className={`p-2.5 rounded-xl bg-noir-850 border border-noir-700 w-fit mb-2.5 ${act.color}`}>
+              <Icon className="w-5 h-5" />
             </div>
-            <h4 className="font-black text-sm sm:text-base leading-tight group-hover:text-amber-200 transition relative z-10">
+            <div className="text-xs font-bold text-ivory-100 group-hover:text-lime-glow transition">
               {act.label}
-            </h4>
-            <p className="text-xs text-emerald-100/80 mt-1 font-semibold relative z-10">{act.desc}</p>
+            </div>
+            <div className="text-[10px] text-ivory-400 font-mono mt-0.5 truncate">{act.desc}</div>
           </Link>
         );
       })}

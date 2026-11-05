@@ -5,36 +5,40 @@ import { Navbar } from './Navbar';
 import { MobileNav } from './MobileNav';
 import { Footer } from './Footer';
 import { DemoBanner } from '../common/DemoBanner';
+import { MonsoonNoirAtmosphere } from '../common/MonsoonNoirAtmosphere';
 import { X } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAF8]">
+    <div className="min-h-screen flex flex-col bg-noir-950 text-ivory-100 relative selection:bg-lime-accent selection:text-noir-950">
+      {/* Ambient Atmospheric Background Layers */}
+      <MonsoonNoirAtmosphere showGrid={true} showContours={true} intensity="medium" />
+
       {/* Top Demo Banner */}
       <DemoBanner />
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 relative z-10">
         {/* Desktop Sidebar */}
         <div className="hidden md:block w-64 flex-shrink-0">
-          <div className="fixed top-11 bottom-0 w-64">
+          <div className="fixed top-10 bottom-0 w-64">
             <Sidebar />
           </div>
         </div>
 
         {/* Mobile Sidebar Overlay */}
         {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 md:hidden flex">
+          <div className="fixed inset-0 z-50 md:hidden flex animate-in fade-in">
             <div
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+              className="fixed inset-0 bg-noir-950/80 backdrop-blur-md"
               onClick={() => setMobileMenuOpen(false)}
             />
-            <div className="relative w-72 max-w-[80vw] bg-white h-full z-10 flex flex-col shadow-2xl">
+            <div className="relative w-72 max-w-[80vw] bg-noir-900 border-r border-noir-700 h-full z-10 flex flex-col shadow-2xl">
               <div className="absolute top-4 right-4 z-20">
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1.5 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100"
+                  className="p-1.5 text-ivory-400 hover:text-lime-accent rounded-lg hover:bg-noir-800"
                 >
                   <X className="w-5 h-5" />
                 </button>

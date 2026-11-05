@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { StatCard } from '../components/common/StatCard';
 import { QuickActions } from '../components/dashboard/QuickActions';
@@ -13,193 +14,200 @@ import {
   Activity,
   CheckCircle,
   AlertTriangle,
-  Info,
   Sparkles,
-  Sun,
   Sprout,
+  Landmark,
+  TrendingUp,
+  BotMessageSquare,
+  ArrowRight,
+  ShieldCheck,
 } from 'lucide-react';
+import { MANDI_RECORDS } from '../data/mockData';
 
 export const DashboardPage: React.FC = () => {
-  const { profile, crops, zones } = useApp();
+  const { profile, crops, zones, applications, language } = useApp();
 
   const totalAcres = crops.reduce((sum, c) => sum + c.areaAcres, 0);
   const activeValves = zones.filter((z) => z.valveStatus === 'Open').length;
-  const healthyCrops = crops.filter((c) => c.health === 'Optimal').length;
   const avgMoisture = Math.round(
     zones.reduce((sum, z) => sum + z.currentMoisture, 0) / (zones.length || 1)
   );
+  const totalDisbursed = applications.reduce((sum, a) => sum + (a.benefitReceivedAmount || 0), 0);
+
+  const greeting =
+    language === 'kn'
+      ? `ನಮಸ್ಕಾರ, ${profile.name}! 🙏`
+      : language === 'hi'
+      ? `नमस्ते, ${profile.name}! 🙏`
+      : `Namaskara, ${profile.name}! 🙏`;
 
   return (
-    <div className="space-y-7">
-      {/* Scenic Farm Hero Banner */}
-      <div className="relative rounded-3xl overflow-hidden shadow-lg border border-emerald-500/20 bg-gradient-to-r from-emerald-950 via-forest-900 to-teal-950 text-white p-7 sm:p-9">
-        {/* Background farm atmospheric glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-amber-400/20 via-emerald-500/10 to-transparent pointer-events-none" />
-        <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-10 translate-y-10">
-          <Sprout className="w-80 h-80 text-emerald-300" />
-        </div>
-
+    <div className="space-y-8 animate-in fade-in duration-300">
+      {/* MONSOON NOIR HERO COMMAND CENTRE BANNER */}
+      <div className="relative rounded-3xl overflow-hidden noir-card border border-noir-700/80 shadow-noir-elevated p-6 sm:p-8">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-black uppercase tracking-wider bg-gradient-to-r from-emerald-500/40 to-teal-500/40 text-emerald-200 px-3.5 py-1 rounded-full border border-emerald-400/40 flex items-center gap-2 shadow-xs">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-sensor-pulse"></span>
-                <span>Active Field Session</span>
+              <span className="text-xs font-mono font-bold bg-lime-accent/15 text-lime-glow px-3 py-1 rounded-full border border-lime-accent/30 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-lime-accent animate-ping" />
+                <span>Command Centre Active</span>
               </span>
-              <span className="text-xs font-bold text-amber-300 bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/30 flex items-center gap-1">
+              <span className="text-xs font-mono font-bold text-amber-solar bg-amber-solar/15 px-3 py-1 rounded-full border border-amber-solar/30 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Kisan ID: {profile.kisanId}</span>
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white drop-shadow-sm">
-              Namaskara, {profile.name}! 🙏
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-ivory-100">
+              {greeting}
             </h1>
 
-            <p className="text-xs sm:text-sm text-emerald-100/90 max-w-2xl leading-relaxed font-medium">
-              Daily agronomic command center for your <strong className="text-white">{profile.location}</strong> farm holding.
-              All sensor probes, drip lines, and microclimate feeds are updated.
+            <p className="text-xs sm:text-sm text-ivory-300 max-w-2xl leading-relaxed">
+              Real-time agro-telemetry, Gemini 1.5 agronomist, and scheme tracker for your{' '}
+              <strong className="text-ivory-100 font-semibold">{profile.location}</strong> farm holding.
             </p>
+
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs font-mono text-ivory-400">
+              <span className="flex items-center gap-1 text-ivory-300">
+                <MapPin className="w-3.5 h-3.5 text-lime-accent" />
+                <span>Taluk: {profile.taluk} (GPS Calibrated)</span>
+              </span>
+              <span>•</span>
+              <span>Soil: {profile.soilType}</span>
+              <span>•</span>
+              <span className="text-cyan-ice">Irrigation: {profile.irrigationType}</span>
+            </div>
           </div>
 
-          <div className="flex flex-wrap md:flex-col items-start md:items-end gap-2.5 text-xs">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/15 shadow-xs font-semibold">
-              <Calendar className="w-4 h-4 text-emerald-300" />
-              <span>
-                {new Date().toLocaleDateString('en-IN', {
-                  weekday: 'short',
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric',
-                })}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/15 shadow-xs font-semibold">
-              <MapPin className="w-4 h-4 text-amber-300" />
-              <span>
-                {profile.taluk}, {profile.district} (Cauvery Basin)
-              </span>
-            </div>
+          <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
+            <Link
+              to="/assistant"
+              className="px-4 py-2.5 rounded-xl bg-lime-accent text-noir-950 font-mono font-bold text-xs flex items-center justify-center gap-2 hover:bg-lime-glow transition shadow-glow-lime"
+            >
+              <BotMessageSquare className="w-4 h-4 text-noir-950" />
+              <span>Ask Pulse AI</span>
+            </Link>
+
+            <Link
+              to="/schemes"
+              className="px-4 py-2.5 rounded-xl bg-noir-850 hover:bg-noir-800 text-ivory-200 border border-noir-700 text-xs font-mono font-medium flex items-center justify-center gap-2 transition"
+            >
+              <Landmark className="w-4 h-4 text-amber-solar" />
+              <span>Schemes Centre</span>
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Colorful Quick Action Launchers */}
+      {/* QUICK ACTIONS BAR */}
       <QuickActions />
 
-      {/* Core Farm Metrics Cards with Aesthetic Gradient Glows */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {/* 4 CORE KPI STAT CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Total Cultivated Land"
-          value={`${totalAcres} / ${profile.totalLandAcres} Ac`}
-          subtitle={`Red Sandy Loam • ${profile.irrigationType}`}
-          icon={Layers}
-          iconBgColor="bg-emerald-100"
-          iconColor="text-emerald-800"
-          trend={{ value: `${crops.length} Active Crops`, isPositive: true, label: 'planted' }}
+          title="Active Crop Land"
+          value={`${totalAcres.toFixed(1)} / ${profile.totalLandAcres} Ac`}
+          subtitle={`${crops.length} Registered field plots`}
+          icon={Sprout}
+          badge="Optimal Vigour"
+          iconBgColor="bg-lime-accent/15"
+          iconColor="text-lime-accent"
+          trend={{ value: '100% Sown', isPositive: true, label: 'Kharif + Rabi' }}
         />
 
         <StatCard
-          title="Average Soil Moisture"
+          title="Soil Moisture Avg"
           value={`${avgMoisture}%`}
-          subtitle="4 telemetry probe nodes"
+          subtitle={`${activeValves} Solenoid Valves Open`}
           icon={Droplets}
-          iconBgColor="bg-sky-100"
-          iconColor="text-sky-700"
-          badge="Live telemetry"
-          trend={{
-            value: zones.some((z) => z.status === 'Critical Low') ? 'Alert in Zone C' : 'Healthy',
-            isPositive: !zones.some((z) => z.status === 'Critical Low'),
-            label: 'moisture level',
-          }}
+          badge="ESP32 Stream"
+          iconBgColor="bg-cyan-moisture/15"
+          iconColor="text-cyan-ice"
+          trend={{ value: 'Drip Active', isPositive: true, label: 'Zone A & C' }}
         />
 
         <StatCard
-          title="Irrigation Network"
-          value={activeValves > 0 ? `${activeValves} Active Valves` : 'All Closed'}
-          subtitle="Solenoid drip & sprinkler valves"
-          icon={Activity}
-          iconBgColor="bg-teal-100"
-          iconColor="text-teal-800"
-          trend={{
-            value: `${zones.length} Zones`,
-            isPositive: true,
-            label: 'monitored',
-          }}
+          title="Schemes Pipeline"
+          value={`${applications.length} Active`}
+          subtitle={`₹${totalDisbursed.toLocaleString('en-IN')} DBT Received`}
+          icon={Landmark}
+          badge="Verified"
+          iconBgColor="bg-amber-solar/15"
+          iconColor="text-amber-solar"
+          trend={{ value: 'PM-KISAN + PMKSY', isPositive: true, label: 'Tracked' }}
         />
 
         <StatCard
-          title="Crop Health Status"
-          value={`${healthyCrops} / ${crops.length} Optimal`}
-          subtitle="1 Attention flagged (Leaf blast)"
-          icon={CheckCircle}
-          iconBgColor="bg-amber-100"
-          iconColor="text-amber-800"
-          trend={{
-            value: 'Paddy alert',
-            isPositive: false,
-            label: 'blast warning',
-          }}
+          title="Mandi APMC Index"
+          value="₹2,150"
+          subtitle="Tomato (Mandya APMC)"
+          icon={TrendingUp}
+          badge="Upward"
+          iconBgColor="bg-emerald-500/15"
+          iconColor="text-emerald-bright"
+          trend={{ value: '+6.4% 30d', isPositive: true, label: 'Strong arrival' }}
         />
       </div>
 
-      {/* Weather & Soil Moisture Grid */}
+      {/* CORE DUAL WIDGETS: WEATHER & TELEMETRY */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <WeatherWidget />
         <SoilMoistureWidget />
       </div>
 
-      {/* Crop Inventory & Insights */}
-      <CropStatusSummary />
-
-      {/* Recent Alerts Feed with Eye-Catching Highlights */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-emerald-100 shadow-sm relative overflow-hidden">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-amber-100 text-amber-800 shadow-xs">
-              <AlertTriangle className="w-5 h-5 text-amber-700" />
-            </span>
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900">
-                Live Field Alerts & Agronomic Broadcasts
-              </h3>
-              <p className="text-xs text-slate-500 font-medium">Automatic telemetry triggers</p>
-            </div>
-          </div>
-          <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            Updated 5m ago
-          </span>
+      {/* BOTTOM ROW: ACTIVE CROPS & MANDI INTELLIGENCE SNAPSHOT */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <CropStatusSummary />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50/60 border border-amber-200/80 shadow-xs">
-            <div className="flex items-center gap-2 font-bold text-amber-950 mb-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
-              <span>Irrigation Required in Zone C</span>
+        {/* Mandi APMC Quick Watchlist */}
+        <div className="rounded-3xl noir-card p-6 border border-noir-700/80 shadow-noir-card flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-bright flex items-center gap-1">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span>APMC Market Ticker</span>
+                </span>
+                <h3 className="text-base font-bold text-ivory-100 mt-0.5">Wholesale Benchmarks</h3>
+              </div>
+              <Link to="/mandi" className="text-xs text-lime-accent hover:underline font-mono font-bold">
+                View All
+              </Link>
             </div>
-            <p className="text-slate-700 text-[11px] leading-relaxed font-medium">
-              Ragi plot soil moisture is at 33% (target 45%). Recommend activating Zone C sprinkler.
-            </p>
+
+            <div className="space-y-3">
+              {MANDI_RECORDS.slice(0, 3).map((item) => (
+                <div
+                  key={item.id}
+                  className="p-3 rounded-2xl bg-noir-850 border border-noir-700 flex items-center justify-between text-xs"
+                >
+                  <div>
+                    <h4 className="font-bold text-ivory-100">{item.commodity}</h4>
+                    <p className="text-[10px] text-ivory-400 font-mono">{item.marketName}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-mono font-bold text-lime-glow">
+                      ₹{item.modalPrice.toLocaleString('en-IN')}
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-bright">
+                      +{item.percentChange}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50/60 border border-emerald-200/80 shadow-xs">
-            <div className="flex items-center gap-2 font-bold text-emerald-950 mb-1.5">
-              <Sun className="w-4 h-4 text-emerald-600" />
-              <span>Optimal Spraying Window</span>
-            </div>
-            <p className="text-slate-700 text-[11px] leading-relaxed font-medium">
-              Mandya weather favorable for foliar spraying until 11:30 AM before wind velocity picks up.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-sky-50 to-blue-50/60 border border-sky-200/80 shadow-xs">
-            <div className="flex items-center gap-2 font-bold text-sky-950 mb-1.5">
-              <Info className="w-4 h-4 text-sky-600" />
-              <span>PMKSY Subsidy Scheme</span>
-            </div>
-            <p className="text-slate-700 text-[11px] leading-relaxed font-medium">
-              Applications open for 90% micro-irrigation subsidy at Maddur Raitha Samparka Kendra.
-            </p>
+          <div className="mt-5 pt-3 border-t border-noir-700">
+            <Link
+              to="/mandi"
+              className="text-xs text-lime-accent hover:underline font-mono font-bold flex items-center justify-between group"
+            >
+              <span>Explore 30-Day Agmarknet Trends</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
       </div>
