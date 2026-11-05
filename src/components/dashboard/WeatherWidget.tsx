@@ -7,35 +7,35 @@ export const WeatherWidget: React.FC = () => {
   const { weather, profile } = useApp();
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-7 border border-emerald-100 shadow-sm flex flex-col justify-between relative overflow-hidden">
+    <div className="rounded-3xl noir-card p-6 border border-noir-700/80 shadow-noir-card flex flex-col justify-between relative overflow-hidden">
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800/70 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-500" />
-              <span>Microclimate Radar</span>
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-lime-accent flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-lime-accent" />
+              <span>Open-Meteo Microclimate</span>
             </span>
-            <h3 className="text-base font-black text-slate-900">
+            <h3 className="text-base font-bold text-ivory-100 mt-0.5">
               {profile.district}, {profile.state}
             </h3>
           </div>
-          <span className="text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200/80 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-            <span>Simulated</span>
+          <span className="text-xs font-mono font-bold bg-noir-850 text-cyan-ice border border-cyan-moisture/40 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-cyan-ice animate-pulse"></span>
+            <span>{weather.isLive ? 'Live API' : 'Simulated'}</span>
           </span>
         </div>
 
-        {/* Big Temperature Display with Sun Glow */}
-        <div className="flex items-center justify-between my-3 p-4 rounded-2xl bg-gradient-to-r from-amber-50/70 via-emerald-50/50 to-teal-50/50 border border-amber-200/60">
+        {/* Big Temperature Display */}
+        <div className="flex items-center justify-between my-3 p-4 rounded-2xl bg-noir-850 border border-noir-700">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-md shadow-amber-500/25">
-              <CloudSun className="w-9 h-9" />
+            <div className="w-14 h-14 rounded-2xl bg-amber-solar/20 text-amber-solar border border-amber-solar/40 flex items-center justify-center shadow-glow-amber">
+              <CloudSun className="w-8 h-8" />
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              <div className="text-3xl sm:text-4xl font-mono font-black text-ivory-100 tracking-tight">
                 {weather.temp}°C
               </div>
-              <p className="text-xs text-emerald-800 font-bold">
+              <p className="text-xs text-lime-glow font-mono font-medium">
                 {weather.condition} • Feels like {weather.feelsLike}°C
               </p>
             </div>
@@ -43,54 +43,60 @@ export const WeatherWidget: React.FC = () => {
         </div>
 
         {/* Weather Metrics Grid */}
-        <div className="grid grid-cols-3 gap-2.5 mt-4 pt-3 border-t border-slate-100 text-center">
-          <div className="p-3 rounded-2xl bg-sky-50/70 border border-sky-100">
-            <div className="flex items-center justify-center gap-1 text-sky-700 text-xs mb-1 font-bold">
-              <Droplet className="w-3.5 h-3.5 text-sky-500" />
+        <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-noir-700 text-center font-mono">
+          <div className="p-2.5 rounded-xl bg-noir-850 border border-noir-700">
+            <div className="flex items-center justify-center gap-1 text-cyan-ice text-[11px] mb-0.5">
+              <Droplet className="w-3 h-3" />
               <span>Humidity</span>
             </div>
-            <span className="text-base font-black text-slate-900">{weather.humidity}%</span>
+            <span className="text-sm font-bold text-ivory-100">{weather.humidity}%</span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-teal-50/70 border border-teal-100">
-            <div className="flex items-center justify-center gap-1 text-teal-700 text-xs mb-1 font-bold">
-              <Wind className="w-3.5 h-3.5 text-teal-500" />
+          <div className="p-2.5 rounded-xl bg-noir-850 border border-noir-700">
+            <div className="flex items-center justify-center gap-1 text-emerald-bright text-[11px] mb-0.5">
+              <Wind className="w-3 h-3" />
               <span>Wind</span>
             </div>
-            <span className="text-base font-black text-slate-900">{weather.windSpeed} km/h</span>
+            <span className="text-sm font-bold text-ivory-100">{weather.windSpeed} km/h</span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-blue-50/70 border border-blue-100">
-            <div className="flex items-center justify-center gap-1 text-blue-700 text-xs mb-1 font-bold">
-              <Droplet className="w-3.5 h-3.5 text-blue-500" />
-              <span>Rain Chance</span>
+          <div className="p-2.5 rounded-xl bg-noir-850 border border-noir-700">
+            <div className="flex items-center justify-center gap-1 text-amber-solar text-[11px] mb-0.5">
+              <span>Rain</span>
             </div>
-            <span className="text-base font-black text-slate-900">{weather.rainfallChance}%</span>
+            <span className="text-sm font-bold text-ivory-100">{weather.rainfallChance}%</span>
           </div>
         </div>
 
-        {/* Spray Window Advisory */}
-        <div className="mt-4 p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/90 flex items-start gap-2.5 text-xs">
+        {/* Agricultural Spray Advisory Banner */}
+        <div
+          className={`mt-4 p-3 rounded-2xl border text-xs leading-relaxed flex items-start gap-2.5 ${
+            weather.sprayAdvisory.recommended
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+              : 'bg-amber-solar/10 border-amber-solar/30 text-amber-300'
+          }`}
+        >
           {weather.sprayAdvisory.recommended ? (
-            <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+            <ShieldCheck className="w-4 h-4 text-emerald-bright flex-shrink-0 mt-0.5" />
           ) : (
-            <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 text-amber-solar flex-shrink-0 mt-0.5" />
           )}
           <div>
-            <span className="font-black text-emerald-950">Spray Window Advisory: </span>
-            <span className="text-emerald-800 font-medium">{weather.sprayAdvisory.reason}</span>
+            <span className="font-bold font-mono">
+              {weather.sprayAdvisory.recommended ? 'Spray Window Safe' : 'Foliar Spray Postponed'}
+            </span>
+            <p className="text-[11px] text-ivory-300 mt-0.5">{weather.sprayAdvisory.reason}</p>
           </div>
         </div>
       </div>
 
-      <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-        <span className="text-slate-500 font-medium">7-day microclimate horizon</span>
+      <div className="mt-5 pt-3 border-t border-noir-700">
         <Link
           to="/weather"
-          className="font-extrabold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition group"
+          className="text-xs text-lime-accent hover:underline font-mono font-bold flex items-center justify-between group"
         >
-          <span>View Forecast Radar</span>
-          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          <span>View 7-Day Precision Forecast</span>
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </div>

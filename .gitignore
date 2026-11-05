@@ -6,6 +6,9 @@ node_modules
 # Production build artifacts
 dist
 build
+.vite
+*.zip
+KrishiPulse_zip_temp
 
 # Environment files
 .env

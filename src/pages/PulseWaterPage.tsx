@@ -10,7 +10,13 @@ import {
   Radio,
   CheckCircle2,
   Sparkles,
-  Waves,
+  Cpu,
+  AlertTriangle,
+  Code2,
+  Battery,
+  Thermometer,
+  ShieldAlert,
+  ArrowRight,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -24,251 +30,172 @@ import {
   Bar,
   Legend,
 } from 'recharts';
-import { Badge } from '../components/common/Badge';
 
 export const PulseWaterPage: React.FC = () => {
-  const { zones, toggleValve } = useApp();
-  const [activeChartTab, setActiveChartTab] = useState<'consumption' | 'efficiency'>('consumption');
+  const { zones, toggleValve, triggerIrrigation, isSimulatedSensorMode, toggleSimulatedSensorMode } = useApp();
+  const [activeChartTab, setActiveChartTab] = useState<'consumption' | 'comparison'>('consumption');
+  const [selectedDuration, setSelectedDuration] = useState<number>(30);
 
-  const totalWaterSavedEstimate = 18400;
   const activeValvesCount = zones.filter((z) => z.valveStatus === 'Open').length;
 
   return (
-    <div className="space-y-7">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-sky-500 to-blue-600 text-white px-3 py-0.5 rounded-full shadow-xs">
-              IoT Telemetry Array
-            </span>
-            <span className="text-xs text-sky-800 font-bold">• Simulated Field Sensor Mesh</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            PulseWater Smart Irrigation
-          </h1>
-          <p className="text-sm text-slate-600 mt-1 max-w-2xl font-medium">
-            Real-time simulated soil moisture monitoring, automated solenoid valve actuators, and precision
-            water consumption telemetry for Mandya farm plots.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white border border-sky-200 text-xs font-black text-slate-800 shadow-xs">
-            <Radio className="w-4 h-4 text-emerald-600 animate-pulse" />
-            <span>4 Simulated Probes Active</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Hardware Disclaimer */}
-      <div className="p-4 rounded-3xl bg-gradient-to-r from-sky-50 to-teal-50 border border-sky-200 flex items-start gap-3.5 text-xs leading-relaxed shadow-xs">
-        <div className="p-2 rounded-xl bg-sky-200/60 text-sky-900 flex-shrink-0 mt-0.5">
-          <Info className="w-5 h-5 text-sky-700" />
-        </div>
-        <div>
-          <span className="font-black text-sky-950 text-sm">
-            Simulated Sensor Telemetry Notice:
-          </span>
-          <p className="text-sky-900/90 mt-0.5 font-medium">
-            Soil capacitive readings, flow liters, and valve states rendered below are simulated deterministically inside the client application. No physical microcontrollers (e.g. ESP32, LoRaWAN) are currently attached to field soil.
-          </p>
-        </div>
-      </div>
-
-      {/* Top Telemetry Stats with Color Gradients */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span className="font-black uppercase tracking-wider text-slate-600">Active Valves</span>
-            <div className="p-2.5 rounded-xl bg-sky-100 text-sky-700">
-              <Power className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-3xl font-black text-slate-900">
-            {activeValvesCount} of {zones.length} Open
-          </div>
-          <p className="text-xs text-slate-500 mt-2 flex items-center gap-1.5 font-semibold">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-sensor-pulse"></span>
-            <span>Automated solenoid valves ready</span>
-          </p>
-        </div>
-
-        <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span className="font-black uppercase tracking-wider text-slate-600">Est. Water Saved</span>
-            <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-700">
-              <TrendingDown className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-3xl font-black bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
-            {totalWaterSavedEstimate.toLocaleString()} L
-          </div>
-          <p className="text-xs text-slate-500 mt-2 font-medium">
-            vs. conventional unmonitored flood
-          </p>
-        </div>
-
-        <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span className="font-black uppercase tracking-wider text-slate-600">Average Soil Moisture</span>
-            <div className="p-2.5 rounded-xl bg-blue-100 text-blue-700">
-              <Droplets className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-3xl font-black text-slate-900">
-            {Math.round(
-              zones.reduce((s, z) => s + z.currentMoisture, 0) / (zones.length || 1)
-            )}%
-          </div>
-          <p className="text-xs text-slate-500 mt-2 font-medium">
-            Target across plots: 45% - 65%
-          </p>
-        </div>
-
-        <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span className="font-black uppercase tracking-wider text-slate-600">Probe Health</span>
-            <div className="p-2.5 rounded-xl bg-teal-100 text-teal-700">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-3xl font-black text-slate-900">
-            100% Online
-          </div>
-          <p className="text-xs text-slate-500 mt-2 font-medium">
-            4 nodes • Solar battery 94%
-          </p>
-        </div>
-      </div>
-
-      {/* Field Zones Grid with Interactive Valve Toggles */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
+    <div className="space-y-8 animate-in fade-in duration-300">
+      {/* Header Banner */}
+      <div className="relative rounded-3xl overflow-hidden noir-card border border-noir-700/80 shadow-noir-elevated p-6 sm:p-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <span className="text-xs font-black uppercase tracking-wider text-slate-400">
-              Plot-by-Plot Telemetry
-            </span>
-            <h3 className="text-lg font-black text-slate-900">Field Irrigation Zones & Valve Actuators</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="p-2 rounded-xl bg-cyan-moisture/15 text-cyan-ice border border-cyan-moisture/30 shadow-glow-cyan">
+                <Droplets className="w-5 h-5" />
+              </span>
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-ice">
+                IoT Soil Moisture Telemetry
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-ivory-100 tracking-tight">
+              PulseWater Irrigation Mesh
+            </h1>
+            <p className="text-xs sm:text-sm text-ivory-300 mt-1 max-w-2xl leading-relaxed">
+              Multi-zone capacitive soil moisture monitoring, automated solenoid valve control, and precision water usage
+              tracking powered by ESP32 microcontrollers.
+            </p>
           </div>
-          <span className="text-xs text-emerald-800 font-bold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            Click button to toggle simulated valve
+
+          <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
+            <button
+              onClick={toggleSimulatedSensorMode}
+              className={`px-4 py-2.5 rounded-xl border text-xs font-mono font-bold flex items-center justify-center gap-2 transition ${
+                isSimulatedSensorMode
+                  ? 'bg-cyan-moisture/20 border-cyan-moisture/40 text-cyan-ice shadow-glow-cyan'
+                  : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-bright'
+              }`}
+            >
+              <Radio className="w-4 h-4 animate-pulse" />
+              <span>{isSimulatedSensorMode ? 'Simulated Sensor Mode' : 'Hardware Stream Active'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* HARDWARE ISOLATION WARNING */}
+      <div className="p-4 rounded-2xl bg-amber-solar/10 border border-amber-solar/30 flex items-start gap-3 text-xs text-amber-300 leading-relaxed">
+        <ShieldAlert className="w-5 h-5 text-amber-solar flex-shrink-0 mt-0.5" />
+        <div>
+          <strong className="font-mono uppercase font-bold text-amber-200">
+            Hardware Electrical Safety Rule:
+          </strong>{' '}
+          Do not power pump motors directly from ESP32 GPIO pins. Microcontroller pins can only supply 12mA. Always use
+          an optically isolated 5V relay module with flyback diode protection to drive 230V AC or 12V DC solenoids.
+        </div>
+      </div>
+
+      {/* ZONE TELEMETRY CARDS */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Radio className="w-4 h-4 text-cyan-ice animate-pulse" />
+            <h2 className="text-base font-bold text-ivory-100">Active Sensor Probes & Zones</h2>
+          </div>
+          <span className="text-xs font-mono text-ivory-400">
+            {activeValvesCount} of {zones.length} Valves Open
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {zones.map((zone) => {
             const isCritical = zone.status === 'Critical Low';
-            const isNeeded = zone.status === 'Irrigation Needed';
+            const isAttention = zone.status === 'Irrigation Needed';
             const isOpen = zone.valveStatus === 'Open';
-
-            const barGradient = isCritical
-              ? 'bg-gradient-to-r from-rose-500 to-red-600'
-              : isNeeded
-              ? 'bg-gradient-to-r from-amber-400 to-orange-500'
-              : 'bg-gradient-to-r from-emerald-400 to-teal-500';
 
             return (
               <div
                 key={zone.id}
-                className={`bg-white rounded-3xl p-6 sm:p-7 border transition-all duration-300 shadow-sm hover:shadow-card-hover ${
-                  isOpen
-                    ? 'border-sky-300 ring-2 ring-sky-200 bg-gradient-to-br from-sky-50/40 via-white to-teal-50/30'
-                    : 'border-slate-200/90 hover:border-emerald-300'
-                }`}
+                className="rounded-3xl noir-card p-5 border border-noir-700/80 shadow-noir-card flex flex-col justify-between hover:border-cyan-moisture/40 transition space-y-4"
               >
-                {/* Zone Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-black text-lg text-slate-950">{zone.name}</h4>
-                      <Badge
-                        variant={
-                          isCritical ? 'danger' : isNeeded ? 'warning' : 'success'
-                        }
-                        size="sm"
-                      >
-                        {zone.status}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-1 font-medium">
-                      Crop: <strong className="text-slate-800">{zone.crop}</strong> • Area: {zone.areaAcres} Acres
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => toggleValve(zone.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-2xl font-black text-xs transition-all duration-200 shadow-xs ${
-                      isOpen
-                        ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-glow-blue scale-105'
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300'
-                    }`}
-                  >
-                    <Power className="w-4 h-4" />
-                    <span>{isOpen ? 'Valve Open (Flowing)' : 'Turn On Valve'}</span>
-                  </button>
-                </div>
-
-                {/* Animated Water flow wave indicator if valve is open */}
-                {isOpen && (
-                  <div className="mb-3 px-3 py-1.5 rounded-xl bg-sky-100/80 border border-sky-300 text-sky-900 text-xs font-bold flex items-center justify-between animate-pulse">
-                    <span className="flex items-center gap-1.5">
-                      <Waves className="w-4 h-4 text-sky-600" />
-                      <span>Water flowing through drip lateral emitter line</span>
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-2">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-noir-800 text-ivory-300 border border-noir-700">
+                      {zone.id.toUpperCase()}
                     </span>
-                    <span className="text-[10px] uppercase font-black bg-sky-200 px-2 py-0.5 rounded">Active</span>
-                  </div>
-                )}
-
-                {/* Moisture Gauge Progress */}
-                <div className="my-4">
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="text-slate-500 font-bold">Soil Capacitive Moisture</span>
-                    <span className="font-black text-slate-950 text-sm">
-                      {zone.currentMoisture}%{' '}
-                      <span className="text-slate-400 font-normal text-xs">
-                        (target: {zone.targetMoisture}%)
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-ivory-400">
+                      <span className="flex items-center gap-0.5">
+                        <Thermometer className="w-3 h-3 text-amber-solar" />
+                        {zone.soilTemp}°C
                       </span>
+                      <span className="flex items-center gap-0.5">
+                        <Battery className="w-3 h-3 text-emerald-bright" />
+                        {zone.batteryLevel || 92}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <h3 className="text-sm font-bold text-ivory-100">{zone.name}</h3>
+                  <p className="text-[11px] text-ivory-400 font-mono mt-0.5">{zone.crop}</p>
+
+                  {/* Moisture Big Readout */}
+                  <div className="my-4 flex items-baseline justify-between">
+                    <div>
+                      <span className="text-3xl font-mono font-black text-ivory-100">
+                        {zone.currentMoisture}%
+                      </span>
+                      <span className="text-xs font-mono text-ivory-400 ml-1.5">
+                        / Target {zone.targetMoisture}%
+                      </span>
+                    </div>
+                    <span
+                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
+                        isCritical
+                          ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                          : isAttention
+                          ? 'bg-amber-solar/20 text-amber-solar border-amber-solar/40'
+                          : 'bg-lime-accent/20 text-lime-glow border-lime-accent/40'
+                      }`}
+                    >
+                      {zone.status}
                     </span>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200">
+
+                  {/* Visual Bar */}
+                  <div className="w-full bg-noir-800 h-2.5 rounded-full overflow-hidden mb-3">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ${barGradient}`}
-                      style={{ width: `${Math.min(zone.currentMoisture, 100)}%` }}
+                      className={`h-full transition-all duration-500 ${
+                        isCritical
+                          ? 'bg-rose-500'
+                          : isAttention
+                          ? 'bg-amber-solar'
+                          : 'bg-lime-accent'
+                      }`}
+                      style={{ width: `${Math.min(100, Math.max(10, zone.currentMoisture))}%` }}
                     />
                   </div>
+
+                  <div className="text-[11px] text-ivory-300 font-mono flex items-center justify-between">
+                    <span>Last run: {zone.lastWatered}</span>
+                    <span>{zone.areaAcres} Ac</span>
+                  </div>
                 </div>
 
-                {/* Telemetry Metrics */}
-                <div className="grid grid-cols-3 gap-2.5 py-3 px-3.5 rounded-2xl bg-slate-50 text-xs border border-slate-200 font-medium">
-                  <div>
-                    <span className="text-slate-400 text-[10px] block uppercase font-bold">
-                      Recommendation
-                    </span>
-                    <span className="font-black text-slate-900 flex items-center gap-1 mt-0.5">
-                      <Clock className="w-3.5 h-3.5 text-sky-600" />
-                      {zone.recommendedDurationMin > 0 ? `${zone.recommendedDurationMin} mins` : 'None (Saturated)'}
-                    </span>
-                  </div>
+                {/* Valve Controls & Action */}
+                <div className="pt-3 border-t border-noir-700/80 flex items-center justify-between gap-2">
+                  <button
+                    onClick={() => toggleValve(zone.id)}
+                    className={`flex-1 py-2 px-3 rounded-xl border text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition ${
+                      isOpen
+                        ? 'bg-rose-500/20 border-rose-500 text-rose-300 shadow-glow-amber'
+                        : 'bg-noir-800 border-noir-700 text-ivory-200 hover:text-cyan-ice hover:border-cyan-moisture/40'
+                    }`}
+                  >
+                    <Power className="w-3.5 h-3.5" />
+                    <span>{isOpen ? 'Close Valve' : 'Open Valve'}</span>
+                  </button>
 
-                  <div>
-                    <span className="text-slate-400 text-[10px] block uppercase font-bold">
-                      Water Req.
-                    </span>
-                    <span className="font-black text-slate-900 flex items-center gap-1 mt-0.5">
-                      <Droplets className="w-3.5 h-3.5 text-teal-600" />
-                      {zone.estimatedWaterLiters > 0 ? `${zone.estimatedWaterLiters.toLocaleString()} L` : '0 L'}
-                    </span>
-                  </div>
-
-                  <div>
-                    <span className="text-slate-400 text-[10px] block uppercase font-bold">
-                      Last Event
-                    </span>
-                    <span className="font-semibold text-slate-700 truncate block mt-0.5">
-                      {zone.lastWatered}
-                    </span>
-                  </div>
+                  <button
+                    onClick={() => triggerIrrigation(zone.id, selectedDuration)}
+                    className="p-2 rounded-xl bg-cyan-moisture/20 hover:bg-cyan-moisture/30 border border-cyan-moisture/40 text-cyan-ice transition"
+                    title={`Trigger ${selectedDuration} min irrigation burst`}
+                  >
+                    <Clock className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             );
@@ -276,103 +203,128 @@ export const PulseWaterPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Water Usage Analytics with Recharts */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-100 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div>
-            <span className="text-xs font-black uppercase tracking-wider text-sky-700">
-              7-Day Telemetry Trends
-            </span>
-            <h3 className="text-xl font-black text-slate-900">
-              Water Consumption vs. Irrigation Target
-            </h3>
+      {/* ANALYTICS CHARTS & INGESTION CODE */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2 Cols: Water Consumption Chart */}
+        <div className="lg:col-span-2 rounded-3xl noir-card p-6 border border-noir-700 shadow-noir-card space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <Droplets className="w-4 h-4 text-cyan-ice" />
+                <h3 className="text-base font-bold text-ivory-100">Water Consumption Analytics</h3>
+              </div>
+              <p className="text-xs text-ivory-400 font-mono mt-0.5">
+                Daily Liters Applied vs Weather-Optimized Target Liters
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 font-mono text-xs">
+              <button
+                onClick={() => setActiveChartTab('consumption')}
+                className={`px-3 py-1.5 rounded-xl border transition ${
+                  activeChartTab === 'consumption'
+                    ? 'bg-cyan-moisture/20 border-cyan-moisture/40 text-cyan-ice font-bold'
+                    : 'bg-noir-850 border-noir-700 text-ivory-400'
+                }`}
+              >
+                Consumption Area
+              </button>
+              <button
+                onClick={() => setActiveChartTab('comparison')}
+                className={`px-3 py-1.5 rounded-xl border transition ${
+                  activeChartTab === 'comparison'
+                    ? 'bg-cyan-moisture/20 border-cyan-moisture/40 text-cyan-ice font-bold'
+                    : 'bg-noir-850 border-noir-700 text-ivory-400'
+                }`}
+              >
+                Zone Comparison
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl text-xs font-black">
-            <button
-              onClick={() => setActiveChartTab('consumption')}
-              className={`px-4 py-2 rounded-xl transition ${
-                activeChartTab === 'consumption'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              Liters Used (Area)
-            </button>
-            <button
-              onClick={() => setActiveChartTab('efficiency')}
-              className={`px-4 py-2 rounded-xl transition ${
-                activeChartTab === 'efficiency'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              Target vs Actual (Bars)
-            </button>
+          <div className="h-64 w-full pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              {activeChartTab === 'consumption' ? (
+                <AreaChart data={MOCK_WATER_USAGE}>
+                  <defs>
+                    <linearGradient id="waterLiters" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1d372c" vertical={false} />
+                  <XAxis dataKey="date" stroke="#675f50" tick={{ fill: '#9d9482', fontSize: 11, fontFamily: 'monospace' }} />
+                  <YAxis stroke="#675f50" tick={{ fill: '#9d9482', fontSize: 11, fontFamily: 'monospace' }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#0b1611',
+                      borderColor: '#2b4f40',
+                      borderRadius: '12px',
+                      color: '#f4efe4',
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                    }}
+                  />
+                  <Area type="monotone" dataKey="litersUsed" stroke="#06b6d4" strokeWidth={2.5} fill="url(#waterLiters)" name="Actual Liters" />
+                  <Area type="monotone" dataKey="targetLiters" stroke="#a3e635" strokeDasharray="4 4" strokeWidth={1.5} fill="none" name="Target Budget" />
+                </AreaChart>
+              ) : (
+                <BarChart data={zones.map((z) => ({ name: z.id.toUpperCase(), moisture: z.currentMoisture, target: z.targetMoisture }))}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1d372c" vertical={false} />
+                  <XAxis dataKey="name" stroke="#675f50" tick={{ fill: '#9d9482', fontSize: 11, fontFamily: 'monospace' }} />
+                  <YAxis stroke="#675f50" tick={{ fill: '#9d9482', fontSize: 11, fontFamily: 'monospace' }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#0b1611',
+                      borderColor: '#2b4f40',
+                      borderRadius: '12px',
+                      color: '#f4efe4',
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                    }}
+                  />
+                  <Bar dataKey="moisture" fill="#06b6d4" name="Current Moisture %" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="target" fill="#a3e635" name="Target %" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              )}
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Recharts Container */}
-        <div className="h-72 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            {activeChartTab === 'consumption' ? (
-              <AreaChart data={MOCK_WATER_USAGE} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="waterColor" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0284c7" stopOpacity={0.5} />
-                    <stop offset="95%" stopColor="#0284c7" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} />
-                <YAxis
-                  tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(val) => `${val / 1000}k L`}
-                />
-                <Tooltip
-                  formatter={(val: number) => [`${val.toLocaleString()} Liters`, 'Liters Used']}
-                  contentStyle={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #bae6fd', boxShadow: '0 4px 12px rgba(2, 132, 199, 0.1)' }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="litersUsed"
-                  stroke="#0284c7"
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#waterColor)"
-                  name="Water Consumed"
-                />
-              </AreaChart>
-            ) : (
-              <BarChart data={MOCK_WATER_USAGE} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} />
-                <YAxis
-                  tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(val) => `${val / 1000}k L`}
-                />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0' }}
-                />
-                <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10, fontWeight: 600 }} />
-                <Bar dataKey="litersUsed" name="Actual Liters" fill="#0284c7" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="targetLiters" name="Target Budget" fill="#cbd5e1" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            )}
-          </ResponsiveContainer>
-        </div>
+        {/* Right 1 Col: ESP32 Hardware Webhook Integration Guide */}
+        <div className="rounded-3xl noir-card p-6 border border-noir-700 shadow-noir-card space-y-4 text-xs font-mono">
+          <div className="flex items-center gap-2">
+            <Cpu className="w-4 h-4 text-lime-accent" />
+            <h3 className="text-sm font-bold text-ivory-100">ESP32 Ingestion Guide</h3>
+          </div>
 
-        <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2 font-medium">
-          <span>
-            💡 Notice drop on <strong>02 Nov</strong> due to natural rainfall interception (3.2 mm rain).
-          </span>
-          <span className="font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            Estimated weekly water savings efficiency: +24%
-          </span>
+          <p className="text-ivory-400 text-[11px] leading-relaxed">
+            Configure your field NodeMCU or ESP32 Wi-Fi module to send telemetry every 5 minutes:
+          </p>
+
+          <div className="p-3 rounded-2xl bg-noir-950 border border-noir-700 overflow-x-auto text-[10px] text-lime-glow space-y-1">
+            <div className="text-ivory-400"># HTTP Post Request Sample</div>
+            <div>curl -X POST http://localhost:5000/api/sensors/readings \</div>
+            <div>&nbsp;&nbsp;-H "X-Device-Token: krishipulse-esp32-secret-2026" \</div>
+            <div>&nbsp;&nbsp;-H "Content-Type: application/json" \</div>
+            <div>&nbsp;&nbsp;-d '&#123;</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;"zone_id": "zone-1",</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;"soil_moisture": 42.5,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;"temperature": 27.8,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;"humidity": 68.2</div>
+            <div>&nbsp;&nbsp;&#125;'</div>
+          </div>
+
+          <div className="text-[11px] text-ivory-300 space-y-1 pt-1">
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-lime-accent" />
+              <span>Token validated automatically</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-lime-accent" />
+              <span>Database persists to Supabase</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

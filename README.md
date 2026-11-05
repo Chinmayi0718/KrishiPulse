@@ -1,115 +1,134 @@
-# KrishiPulse 🌱
-> **Empowering Every Farmer with Intelligent Agriculture.**
+# KrishiPulse 🌾
+> **Every farming decision, in one place.**
+> 
+> *Design Identity: MONSOON NOIR — Future Agriculture Intelligence*
 
-KrishiPulse is an AI-powered smart agriculture platform designed to help Indian smallholders make smarter farming decisions through hyper-local weather insights, simulated crop disease diagnosis (CropVision), precision soil moisture telemetry (PulseWater), and an AI agronomist assistant.
-
----
-
-## 🌟 Product Highlights & Hackathon Highlights
-
-- **100% Free & Local:** Built strictly adhering to zero-paid API and zero-paid AI constraints. Runs entirely in your browser with deterministic agronomy simulations and local storage persistence.
-- **Calibrated for Indian Agriculture:** Seeded with realistic parameters for **Mandya District, Karnataka** (Sugarcane, Paddy, Ragi, Tomato, Red Sandy Loam soil, and Cauvery Basin weather).
-- **Startup-Grade Design:** Forest and fresh green palette (`#1B4332`, `#2D6A4F`, `#40916C`), sleek typography, subtle shadows, responsive desktop, tablet, and mobile navigation.
-- **Interactive Telemetry:** Live sensor bar gauges, interactive solenoid valve toggles, and Recharts water analytics.
-- **Dual Remedy Protocol:** Disease diagnosis offers both biological/traditional inputs (Panchagavya, *Pseudomonas*) and ICAR-aligned chemical intervention thresholds.
+KrishiPulse is a full-stack, AI-powered smart agriculture platform engineered for Indian farmers. It fuses **Gemini 1.5 Flash** agronomic reasoning, **ESP32 IoT** soil moisture telemetry, real-time **Open-Meteo** satellite weather spray windows, **Agmarknet APMC** mandi prices, and a comprehensive **Government Schemes Centre** with an interactive 8-stage application tracking pipeline.
 
 ---
 
-## 📱 Modules Overview
+## 🌟 Key Platform Modules
 
-| Module | Purpose | Key Features |
+| Module | Core Capability | Tech & Integration |
 |---|---|---|
-| **Marketing Landing Page** | Public product showcase | Hero, product intro, feature grid, 4-step workflow, interactive module preview, impact stats. |
-| **Farmer Dashboard** | Daily farm command center | Personalized greeting (*Namaskara, Ramesh Gowda!*), weather badge, soil moisture bars, active crop overview, urgent field alerts, and AI agronomy recommendations. |
-| **CropVision AI** | Simulated plant disease diagnosis | Crop photo uploader, image preview, 4 one-click demonstration presets (Paddy Blast, Sugarcane Red Rot, Tomato Blight, Healthy Leaf), confidence score, and treatment protocols. |
-| **PulseWater** | Smart irrigation telemetry | 4 simulated field zone probes (Zone A Sugarcane, Zone B Paddy, Zone C Ragi, Zone D Tomato), interactive valve toggles, and 7-day water consumption Area/Bar charts. |
-| **AI Farmer Assistant** | Agronomy chatbot | Interactive conversational assistant with preset question chips for Crop Health, Irrigation, Soil Care, and Government Schemes (PMKSY, Raitha Siri). |
-| **Weather & Spray Radar** | Agro-meteorological guidance | Current simulated weather (Mandya: 29°C, 64% humidity, wind 11 km/h), 7-day forecast cards, and morning spraying window advisory. |
-| **My Crops** | Crop portfolio management | Full CRUD: add, edit, and delete crop records with growth stage progress bars, acreage calculation, and localStorage persistence. |
-| **Farmer Profile** | Kisan registry settings | Editable farmer profile (Name, Location, Language dialect, Soil classification, Land size in acres, and Irrigation type). |
+| **Farmer Command Centre** | Real-time farm telemetry dashboard, personalized greeting, live KPI matrix, microclimate radar, and active crop health summary. | React 18, Tailwind Monsoon Noir, Recharts |
+| **Government Schemes Centre** | Comprehensive directory of Central & Karnataka welfare subsidies (PM-KISAN, PMFBY, PMKSY, KCC, Raitha Siri, Krishi Bhagya, AIF, PM-KUSUM) with eligibility rules, official links, document checklists, and a stage-by-stage application tracker. | Supabase PostgreSQL, Pipeline Stepper, Verified Feeds |
+| **Pulse AI Agronomist** | Multilingual conversational assistant (Kannada, Hindi, English) with voice input (Web Speech API) and text-to-speech audio playback. Provides ICAR-standard dosages and soil-specific guidance. | Google Gemini 1.5 Flash + Web Speech API |
+| **PulseVision AI Scanner** | Multimodal crop leaf photograph diagnostic scanner. Detects foliar fungal lesions, blasts, and nutrient chlorosis with organic biocontrol and chemical curative regimens. | Gemini 1.5 Multimodal Vision + CV Rulebase |
+| **PulseWater IoT Mesh** | Multi-zone capacitive soil moisture telemetry with token-authenticated ESP32 HTTP ingestion (`POST /api/sensors/readings`), solenoid valve controls, and hardware isolation safety protocols. | Node.js / Express + ESP32 Webhook |
+| **Mandi APMC Intelligence** | Daily wholesale benchmark prices (Modal, Min, Max) across Karnataka and inter-state markets (Mandya, Bengaluru, Mysuru, Pune) with interactive 30-day historical trend charts. | Agmarknet / eNAM Data Model + Recharts Area |
+| **Weather & Spray Window** | Real-time agro-meteorological forecasting via Open-Meteo API. Auto-calculates safe chemical spray windows to prevent foliar wash-off. | Live Open-Meteo Satellite API |
+| **Crops & ICAR Calendar** | Active plot holdings CRUD with growth stage tracking (Sowing ➔ Maturity ➔ Harvest) plus scientific crop lifecycle timelines from ICAR & UAS Bengaluru. | Full CRUD + Stepper Visualization |
+| **Farmer Profile & Settings** | Kisan registry identity, GPS coordinates, land parameters, soil classification, irrigation type, and language preference. | Supabase PostgreSQL + Local Storage Fallback |
 
 ---
 
-## 🛠️ Tech Stack
+## 🎨 Visual Identity: Monsoon Noir
 
-- **Framework:** React 18 + TypeScript
-- **Build Tool:** Vite 5
-- **Styling:** Tailwind CSS 3
-- **Routing:** React Router v6
-- **Icons:** Lucide React
-- **Data Visualizations:** Recharts (AreaChart, BarChart)
-- **State & Storage:** React Context API + LocalStorage persistence
+- **Palette:** Deep midnight black (`#050a07`), dark forest charcoal (`#07100b`, `#10211a`), electric lime (`#a3e635`, `#bef264`), emerald glow (`#10b981`), and atmospheric cyan (`#06b6d4`).
+- **Typography:** Warm ivory (`#fdfbf7`, `#f4efe4`) on high-contrast dark surfaces with JetBrains Mono data readouts.
+- **Micro-Animations:** Atmospheric monsoon rain streaks, topographic contour vector layers, glowing radar pulses, and smooth skeleton shimmers.
 
 ---
 
-## 🚀 Quick Start Instructions
+## 🛠️ Full-Stack Architecture
+
+```
+KrishiPulse/
+├── src/
+│   ├── components/
+│   │   ├── common/        # MonsoonNoirAtmosphere, AnimatedCounter, StatCard, DemoBanner
+│   │   ├── dashboard/     # WeatherWidget, SoilMoistureWidget, CropStatusSummary, QuickActions
+│   │   └── layout/        # Navbar (GPS & Language), Sidebar, MobileNav, AppLayout, Footer
+│   ├── context/           # AppContext (global state, telemetry pulses, Open-Meteo fetch)
+│   ├── data/              # Realistic Indian agro datasets (Mandya, Agmarknet, Central/State schemes)
+│   ├── pages/             # LandingPage, DashboardPage, AssistantPage, CropVisionPage,
+│   │                      # PulseWaterPage, SchemesPage, MandiPage, WeatherPage, MyCropsPage, ProfilePage
+│   ├── services/          # weatherService (Open-Meteo), storageService (CRUD & persistence)
+│   └── types/             # Complete TypeScript interface definitions
+├── server/
+│   └── index.ts           # Express REST API (Auth, ESP32 Sensor endpoint, Gemini AI, Vision, Schemes)
+├── supabase/
+│   └── schema.sql         # 18 PostgreSQL tables, RLS security policies, and Realtime publications
+├── vercel.json            # Vercel deployment SPA routing & build configuration
+├── tailwind.config.js     # Custom Monsoon Noir theme extension
+└── package.json           # Dependencies & concurrent scripts
+```
+
+---
+
+## 🚀 Quick Start Guide
 
 ### Prerequisites
 - Node.js (v18 or v20+)
 - npm or pnpm
 
-### 1. Clone & Navigate
+### 1. Installation
 ```bash
 git clone https://github.com/Chinmayi0718/KrishiPulse.git
 cd KrishiPulse
-git checkout feature/krishipulse-frontend
-```
-
-### 2. Install Dependencies
-```bash
+git checkout feature/krishipulse-redesign
 npm install
 ```
 
-### 3. Run Development Server
+### 2. Environment Setup (Optional)
+Copy `.env.example` to `.env`:
 ```bash
-npm run dev
+cp .env.example .env
 ```
-Open your browser and navigate to `http://localhost:3000` (or the port Vite prints in your console).
+*(KrishiPulse runs completely out-of-the-box in local demo mode even without API keys! If you provide `GEMINI_API_KEY` or `SUPABASE_URL`, the application automatically connects to live services).*
 
-### 4. Build for Production
+### 3. Run Locally (Full-Stack Mode)
+Run both the Express backend and the Vite frontend simultaneously:
+```bash
+npm run dev:all
+```
+- **Frontend:** `http://localhost:3000` (or next free port)
+- **Backend API:** `http://localhost:5000`
+- **ESP32 Ingestion:** `POST http://localhost:5000/api/sensors/readings`
+
+*(Alternatively, run just the frontend via `npm run dev`).*
+
+### 4. Production Build
 ```bash
 npm run build
 ```
-Generates production-ready, minified bundles into the `dist/` directory with zero TypeScript errors.
+Generates an optimized, type-checked production bundle in `dist/`.
 
 ---
 
-## 🧪 Demonstration Walkthrough (For Judges & Evaluators)
+## 📡 IoT Hardware Ingestion (ESP32)
 
-1. **Landing Page (`/`):**
-   - Scroll through the hero section, startup problem statement, and 4-step workflow.
-   - Click any interactive module tab in the preview section or click **"Launch Farmer App"**.
-2. **Farmer Dashboard (`/dashboard`):**
-   - View personalized greeting for **Ramesh Gowda** in Mandya, Karnataka.
-   - Observe live telemetry pills, weather preview, and crop health status.
-   - Note the simulated alert: *Zone C (Ragi) moisture is critically low (33%)*.
-3. **PulseWater (`/pulsewater`):**
-   - View the 4 field zones.
-   - Click the **"Turn On Valve"** button for Zone C (Ragi) or Zone A (Sugarcane). Watch the state toggle to *Valve Open (Flowing)* instantly.
-   - Toggle between **Liters Used (Area)** and **Target vs Actual (Bars)** charts to inspect 7-day water telemetry.
-4. **CropVision AI (`/cropvision`):**
-   - Click any of the **Quick Demo Test Presets** (e.g. *Paddy Leaf Blast* or *Tomato Early Blight*).
-   - Alternatively, upload any custom photo from your computer to see the image preview.
-   - Inspect the simulated neural diagnosis: **94.2% confidence**, symptoms checklist, and toggle between *Organic Remedies* and *Chemical Treatments*.
-5. **AI Farmer Assistant (`/assistant`):**
-   - Click any category filter (e.g. *Crop Health* or *Schemes*).
-   - Click on the question chip: *"What government subsidies are available for micro-irrigation?"*
-   - Watch the simulated assistant stream the PMKSY 90% subsidy guidance and related quick replies.
-6. **My Crops (`/crops`):**
-   - Click **"Add New Crop"** to create a new crop (e.g. Cotton or Maize).
-   - Verify that the acreage bar updates and the new card appears.
-   - Click the pencil icon to edit or the trash icon to delete.
-7. **Farmer Profile (`/profile`):**
-   - Update farmer name, preferred language, or land holding and click **Save Profile**.
-   - Notice data persists across browser reloads via `localStorage`.
-   - Click **"Reset Demo Account"** at any time to restore the baseline Mandya dataset.
+Physical microcontrollers can post field sensor readings to the local or deployed endpoint:
+
+```bash
+curl -X POST http://localhost:5000/api/sensors/readings \
+  -H "X-Device-Token: krishipulse-esp32-secret-2026" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "ESP32-NODE-MANDYA-01",
+    "zone_id": "zone-1",
+    "zone_name": "Zone A — Sugarcane Plot",
+    "soil_moisture": 42.5,
+    "temperature": 28.2,
+    "humidity": 65.4,
+    "battery_level": 94.0
+  }'
+```
+
+> **Hardware Safety Warning:** Never power heavy inductive pump motor coils directly from ESP32 GPIO pins. Always route control signals through an optically isolated 5V relay module with a flyback diode.
 
 ---
 
-## 🔒 Offline & Cost Policy
-KrishiPulse was intentionally architected to operate with **zero paid API dependencies**. All sensor readings, disease models, and agricultural recommendations run deterministically inside the client application, ensuring that smallholder farmers and evaluators never encounter paywalls, broken API quotas, or credential leaks.
+## ☁️ Deployment
+
+### Deploy to Vercel
+1. Push code to your GitHub repository.
+2. Import project into Vercel.
+3. Vercel automatically detects `vercel.json` with Vite framework presets and SPA routing rewrites.
+4. Add environment variables (`GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`) in the Vercel dashboard.
 
 ---
 
-## 📄 License
-MIT © 2026 KrishiPulse Team
+## 📜 License
+MIT License. Crafted for Indian Farmers & Hackathon Product Innovation.

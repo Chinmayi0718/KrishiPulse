@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import {
   CloudSun,
@@ -14,226 +14,262 @@ import {
   Umbrella,
   Calendar,
   Sparkles,
+  RefreshCw,
+  MapPin,
+  Clock,
+  Navigation,
 } from 'lucide-react';
 
+const PRESET_LOCATIONS = [
+  { name: 'Mandya (Maddur Taluk)', district: 'Mandya', state: 'Karnataka', lat: 12.5842, lon: 77.0427 },
+  { name: 'Bengaluru Rural (Doddaballapur)', district: 'Bengaluru Rural', state: 'Karnataka', lat: 13.2929, lon: 77.5401 },
+  { name: 'Mysuru (Nanjangud)', district: 'Mysuru', state: 'Karnataka', lat: 12.1197, lon: 76.6787 },
+  { name: 'Belagavi (Athani Sugar Belt)', district: 'Belagavi', state: 'Karnataka', lat: 16.7328, lon: 75.0592 },
+  { name: 'Shimoga (Bhadravathi)', district: 'Shimoga', state: 'Karnataka', lat: 13.8407, lon: 75.7039 },
+  { name: 'Pune (Baramati)', district: 'Pune', state: 'Maharashtra', lat: 18.1517, lon: 74.5771 },
+];
+
 export const WeatherPage: React.FC = () => {
-  const { weather, profile } = useApp();
+  const { weather, profile, updateProfile, refreshWeather, isLoadingWeather } = useApp();
+  const [selectedPreset, setSelectedPreset] = useState(profile.district);
+
+  const handleLocationChange = async (preset: typeof PRESET_LOCATIONS[0]) => {
+    setSelectedPreset(preset.district);
+    const updated = {
+      ...profile,
+      district: preset.district,
+      state: preset.state,
+      location: `${preset.name}, ${preset.district}`,
+      latitude: preset.lat,
+      longitude: preset.lon,
+    };
+    updateProfile(updated);
+  };
+
+  const handleUseBrowserGPS = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = Number(pos.coords.latitude.toFixed(4));
+          const lon = Number(pos.coords.longitude.toFixed(4));
+          const updated = {
+            ...profile,
+            location: `GPS Field Location (${lat}, ${lon})`,
+            latitude: lat,
+            longitude: lon,
+          };
+          updateProfile(updated);
+        },
+        (err) => {
+          alert('Location access denied or unavailable. Using default Mandya coordinates.');
+        }
+      );
+    }
+  };
 
   const getForecastIcon = (iconName: string) => {
     switch (iconName) {
-      case 'Sun':
-        return <Sun className="w-8 h-8 text-amber-500 animate-pulse" />;
-      case 'CloudRain':
-        return <CloudRain className="w-8 h-8 text-sky-500" />;
-      case 'CloudLightning':
-        return <CloudLightning className="w-8 h-8 text-indigo-500" />;
-      case 'Cloud':
-        return <Cloud className="w-8 h-8 text-slate-400" />;
-      case 'SunCloud':
+      case 'sun':
+        return <Sun className="w-6 h-6 text-amber-solar animate-pulse" />;
+      case 'cloud-rain':
+        return <CloudRain className="w-6 h-6 text-cyan-ice" />;
+      case 'cloud-lightning':
+        return <CloudLightning className="w-6 h-6 text-indigo-400" />;
+      case 'cloud':
+        return <Cloud className="w-6 h-6 text-ivory-400" />;
+      case 'cloud-sun':
       default:
-        return <CloudSun className="w-8 h-8 text-amber-500" />;
+        return <CloudSun className="w-6 h-6 text-amber-solar" />;
     }
   };
 
   return (
-    <div className="space-y-7">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-0.5 rounded-full shadow-xs">
-              Microclimate Radar
-            </span>
-            <span className="text-xs text-amber-900 font-bold">• Simulated Agricultural Forecast</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Weather & Spraying Advisory
-          </h1>
-          <p className="text-sm text-slate-600 mt-1 max-w-2xl font-medium">
-            Simulated hyper-local weather conditions for {profile.location}, Mandya District.
-            Plan fertilizer spraying windows, irrigation postponement, and harvesting with confidence.
-          </p>
-        </div>
-      </div>
-
-      {/* Main Current Weather Card with Sunrise Gradient */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-forest-900 to-amber-950 text-white p-7 sm:p-9 shadow-lg border border-amber-500/20">
-        <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-amber-400/20 via-transparent to-transparent pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
-              <Calendar className="w-4 h-4" />
-              <span>
-                {new Date().toLocaleDateString('en-IN', {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
+    <div className="space-y-8 animate-in fade-in duration-300">
+      {/* Header Banner */}
+      <div className="relative rounded-3xl overflow-hidden noir-card border border-noir-700/80 shadow-noir-elevated p-6 sm:p-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="p-2 rounded-xl bg-cyan-moisture/15 text-cyan-ice border border-cyan-moisture/30 shadow-glow-cyan">
+                <CloudSun className="w-5 h-5" />
               </span>
-              <span>•</span>
-              <span>Mandya Agro-station (Simulated)</span>
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-ice">
+                Satellite Open-Meteo Integration
+              </span>
             </div>
-
-            <div className="flex items-center gap-6">
-              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-400 via-orange-400 to-amber-600 flex items-center justify-center text-white shadow-xl shadow-amber-500/30">
-                <CloudSun className="w-14 h-14" />
-              </div>
-              <div>
-                <div className="text-5xl sm:text-6xl font-black tracking-tight text-white drop-shadow-sm">
-                  {weather.temp}°C
-                </div>
-                <div className="text-sm text-amber-200 font-extrabold mt-1">
-                  {weather.condition} • Feels like {weather.feelsLike}°C
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Metrics Pills with Glowing Accents */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 shadow-xs">
-              <div className="flex items-center gap-1.5 text-xs text-sky-200 mb-1 font-bold">
-                <Droplets className="w-4 h-4 text-sky-300" />
-                <span>Humidity</span>
-              </div>
-              <div className="text-2xl font-black">{weather.humidity}%</div>
-              <div className="text-[10px] text-emerald-200/80 mt-0.5 font-medium">Moderate vapor</div>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 shadow-xs">
-              <div className="flex items-center gap-1.5 text-xs text-teal-200 mb-1 font-bold">
-                <Wind className="w-4 h-4 text-teal-300" />
-                <span>Wind Velocity</span>
-              </div>
-              <div className="text-2xl font-black">{weather.windSpeed} km/h</div>
-              <div className="text-[10px] text-emerald-200/80 mt-0.5 font-medium">{weather.windDirection}</div>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 shadow-xs">
-              <div className="flex items-center gap-1.5 text-xs text-blue-200 mb-1 font-bold">
-                <Umbrella className="w-4 h-4 text-blue-300" />
-                <span>Rainfall</span>
-              </div>
-              <div className="text-2xl font-black">{weather.rainfallMm} mm</div>
-              <div className="text-[10px] text-emerald-200/80 mt-0.5 font-medium">{weather.rainfallChance}% chance</div>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 shadow-xs">
-              <div className="flex items-center gap-1.5 text-xs text-amber-200 mb-1 font-bold">
-                <Thermometer className="w-4 h-4 text-amber-300" />
-                <span>Soil Temp</span>
-              </div>
-              <div className="text-2xl font-black">{weather.soilTemp}°C</div>
-              <div className="text-[10px] text-emerald-200/80 mt-0.5 font-medium">At 15cm depth</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Spray Window & Farming Operations Advisory with Rich Contrast */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
-        <div className="bg-white rounded-3xl p-7 border border-emerald-100 shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-800 mb-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Spray Window Intelligence</span>
-            </div>
-            <h3 className="text-xl font-black text-slate-900 mb-2">
-              Is it a good time to spray fertilizers or pesticides?
-            </h3>
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/80 my-3">
-              <div className="flex items-center gap-2 font-black text-emerald-950 mb-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Favorable Window Open Until 11:30 AM</span>
-              </div>
-              <p className="text-xs text-emerald-900 leading-relaxed font-medium">
-                {weather.sprayAdvisory.reason} Low wind drift hazard ensures droplets settle on foliage without chemical evaporation.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 text-xs pt-4 border-t border-slate-100 font-medium">
-            <div>
-              <span className="text-slate-400 block text-[11px]">Recommended Wind Speed:</span>
-              <span className="font-extrabold text-slate-800">&lt; 15 km/h (Current: 11 km/h)</span>
-            </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">UV Index Hazard:</span>
-              <span className="font-extrabold text-slate-800">{weather.uvIndex} (Moderate)</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-3xl p-7 border border-emerald-100 shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-700 mb-2">
-              <AlertTriangle className="w-4 h-4 text-amber-500" />
-              <span>Monsoon Precipitation Outlook</span>
-            </div>
-            <h3 className="text-xl font-black text-slate-900 mb-2">
-              Showers Predicted on Friday & Saturday
-            </h3>
-            <p className="text-xs text-slate-600 leading-relaxed my-3 font-medium">
-              Simulated meteorological model indicates afternoon convective thunderstorms across Mandya and Maddur on Friday and Saturday (65%–80% rain chance).
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-ivory-100 tracking-tight">
+              Weather & Spray Intelligence
+            </h1>
+            <p className="text-xs sm:text-sm text-ivory-300 mt-1 max-w-2xl leading-relaxed">
+              Hyper-local precipitation radar, spray drift window verification, and irrigation postponement advisory.
             </p>
-            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1 font-medium">
-              <div className="font-black text-amber-900">Agronomic Actions Recommended:</div>
-              <div>• Postpone heavy furrow flood irrigation on Thursday.</div>
-              <div>• Ensure field drainage trenches in paddy wetlands are clear of debris.</div>
-            </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 text-xs text-slate-500 flex items-center justify-between font-medium">
-            <span>Air Quality Index: {weather.airQuality}</span>
-            <span>Sunrise: {weather.sunrise} • Sunset: {weather.sunset}</span>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <button
+              onClick={handleUseBrowserGPS}
+              className="px-3.5 py-2 rounded-xl bg-noir-850 hover:bg-noir-800 text-ivory-300 border border-noir-700 text-xs font-mono flex items-center justify-center gap-1.5 transition"
+              title="Detect GPS Coordinates"
+            >
+              <Navigation className="w-3.5 h-3.5 text-lime-accent" />
+              <span>Detect GPS</span>
+            </button>
+
+            <button
+              onClick={refreshWeather}
+              disabled={isLoadingWeather}
+              className="px-4 py-2 rounded-xl bg-lime-accent text-noir-950 font-mono font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-lime-glow transition shadow-glow-lime disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-noir-950 ${isLoadingWeather ? 'animate-spin' : ''}`} />
+              <span>{isLoadingWeather ? 'Fetching...' : 'Sync Weather'}</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* 7-Day Forecast Grid */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-100 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
+      {/* LOCATION PRESETS BAR */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <span className="text-xs font-mono text-ivory-400 whitespace-nowrap mr-1 flex items-center gap-1">
+          <MapPin className="w-3.5 h-3.5 text-lime-accent" />
+          <span>Taluk Select:</span>
+        </span>
+        {PRESET_LOCATIONS.map((loc) => (
+          <button
+            key={loc.district}
+            onClick={() => handleLocationChange(loc)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono transition whitespace-nowrap ${
+              selectedPreset === loc.district
+                ? 'bg-lime-accent/20 border border-lime-accent/50 text-lime-glow font-bold'
+                : 'bg-noir-850 border border-noir-700 text-ivory-300 hover:bg-noir-800'
+            }`}
+          >
+            {loc.name}
+          </button>
+        ))}
+      </div>
+
+      {/* MAIN CURRENT WEATHER DISPLAY */}
+      <div className="rounded-3xl noir-card p-6 sm:p-8 border border-noir-700 shadow-noir-card relative overflow-hidden space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-noir-700">
           <div>
-            <span className="text-xs font-black uppercase tracking-wider text-slate-400">
-              Extended Horizon
-            </span>
-            <h3 className="text-xl font-black text-slate-900">7-Day Simulated Agro-Forecast</h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-lime-accent">
+                {profile.location}
+              </span>
+              <span className="text-ivory-400 text-xs font-mono">
+                ({profile.latitude.toFixed(2)}° N, {profile.longitude.toFixed(2)}° E)
+              </span>
+            </div>
+            <div className="text-3xl sm:text-5xl font-mono font-black text-ivory-100 mt-2">
+              {weather.temp}°C
+            </div>
+            <p className="text-xs text-lime-glow font-mono font-semibold mt-1">
+              {weather.condition} • Feels like {weather.feelsLike}°C
+            </p>
           </div>
-          <span className="text-xs text-emerald-800 font-extrabold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            Mandya District
-          </span>
+
+          <div className="text-left sm:text-right space-y-1">
+            <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-noir-850 text-cyan-ice border border-cyan-moisture/40">
+              {weather.isLive ? 'Open-Meteo Live Stream' : 'Calibrated Local Model'}
+            </span>
+            <div className="text-[11px] font-mono text-ivory-400 flex items-center sm:justify-end gap-1 pt-2">
+              <Clock className="w-3.5 h-3.5 text-ivory-400" />
+              <span>Last Synchronized: {weather.lastUpdated}</span>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3.5">
-          {weather.forecast7Days.map((f, idx) => (
+        {/* Current Weather KPI Matrix */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
+          <div className="p-4 rounded-2xl bg-noir-850 border border-noir-700 text-center">
+            <div className="flex items-center justify-center gap-1.5 text-cyan-ice text-xs mb-1">
+              <Droplets className="w-4 h-4" />
+              <span>Relative Humidity</span>
+            </div>
+            <div className="text-2xl font-bold text-ivory-100">{weather.humidity}%</div>
+            <span className="text-[10px] text-ivory-400">Canopy Moisture</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-noir-850 border border-noir-700 text-center">
+            <div className="flex items-center justify-center gap-1.5 text-emerald-bright text-xs mb-1">
+              <Wind className="w-4 h-4" />
+              <span>Wind Speed</span>
+            </div>
+            <div className="text-2xl font-bold text-ivory-100">{weather.windSpeed} km/h</div>
+            <span className="text-[10px] text-ivory-400">Direction: {weather.windDirection}</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-noir-850 border border-noir-700 text-center">
+            <div className="flex items-center justify-center gap-1.5 text-amber-solar text-xs mb-1">
+              <CloudRain className="w-4 h-4" />
+              <span>Rain Probability</span>
+            </div>
+            <div className="text-2xl font-bold text-ivory-100">{weather.rainfallChance}%</div>
+            <span className="text-[10px] text-ivory-400">{weather.rainfallMm} mm Expected</span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-noir-850 border border-noir-700 text-center">
+            <div className="flex items-center justify-center gap-1.5 text-lime-accent text-xs mb-1">
+              <Thermometer className="w-4 h-4" />
+              <span>Soil Temperature</span>
+            </div>
+            <div className="text-2xl font-bold text-ivory-100">{weather.soilTemp}°C</div>
+            <span className="text-[10px] text-ivory-400">10cm Root Depth</span>
+          </div>
+        </div>
+
+        {/* Agricultural Spray Advisory Banner */}
+        <div
+          className={`p-4 rounded-2xl border text-xs leading-relaxed flex items-start gap-3 ${
+            weather.sprayAdvisory.recommended
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+              : 'bg-amber-solar/10 border-amber-solar/30 text-amber-300'
+          }`}
+        >
+          {weather.sprayAdvisory.recommended ? (
+            <ShieldCheck className="w-5 h-5 text-emerald-bright flex-shrink-0 mt-0.5" />
+          ) : (
+            <AlertTriangle className="w-5 h-5 text-amber-solar flex-shrink-0 mt-0.5" />
+          )}
+          <div>
+            <span className="font-bold font-mono text-sm block">
+              {weather.sprayAdvisory.recommended
+                ? 'Optimal Agricultural Spray Window Active'
+                : 'Unfavorable Spray Conditions — Chemical Washing Risk'}
+            </span>
+            <p className="text-xs text-ivory-200 mt-1">{weather.sprayAdvisory.reason}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 7-DAY FORECAST GRID */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-lime-accent" />
+          <h2 className="text-base font-bold text-ivory-100">7-Day Agricultural Forecast</h2>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+          {weather.forecast7Days?.map((day, idx) => (
             <div
               key={idx}
-              className={`p-4 rounded-2xl border text-center flex flex-col items-center justify-between transition-all duration-200 hover:scale-105 ${
-                idx === 0
-                  ? 'bg-gradient-to-b from-amber-50/80 to-emerald-50/80 border-amber-300 ring-2 ring-amber-200 shadow-xs'
-                  : 'bg-slate-50/70 border-slate-200/80 hover:bg-white hover:border-emerald-300 shadow-2xs'
-              }`}
+              className="p-4 rounded-2xl noir-card border border-noir-700 text-center space-y-2 hover:border-lime-accent/40 transition shadow-noir-card"
             >
-              <div>
-                <span className="text-xs font-black text-slate-900 block">{f.day}</span>
-                <span className="text-[10px] text-slate-400 font-bold">{f.date}</span>
+              <div className="text-xs font-mono font-bold text-lime-glow">{day.day}</div>
+              <div className="text-[10px] font-mono text-ivory-400">{day.date}</div>
+
+              <div className="py-2 flex justify-center">{getForecastIcon(day.iconName)}</div>
+
+              <div className="text-sm font-mono font-bold text-ivory-100">
+                {day.tempMax}° / <span className="text-ivory-400 font-normal">{day.tempMin}°</span>
               </div>
 
-              <div className="my-3.5">{getForecastIcon(f.iconName)}</div>
-
-              <div>
-                <div className="text-sm font-black text-slate-900">
-                  {f.tempMax}° / <span className="text-slate-400 font-normal">{f.tempMin}°</span>
-                </div>
-                <div className="text-[10px] text-slate-600 font-bold mt-1 truncate max-w-[80px]">
-                  {f.condition}
-                </div>
-                <div className="text-[11px] font-black text-sky-600 mt-1">
-                  💧 {f.rainChance}%
-                </div>
+              <div className="text-[10px] text-cyan-ice font-mono flex items-center justify-center gap-0.5">
+                <Umbrella className="w-3 h-3" />
+                <span>{day.rainChance}%</span>
               </div>
+
+              <div className="text-[10px] text-ivory-400 font-mono truncate">{day.condition}</div>
             </div>
           ))}
         </div>

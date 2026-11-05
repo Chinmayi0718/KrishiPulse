@@ -1,18 +1,18 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ScanLine, Droplets, BotMessageSquare, Sprout } from 'lucide-react';
+import { LayoutDashboard, ScanLine, Droplets, BotMessageSquare, Landmark } from 'lucide-react';
 
 export const MobileNav: React.FC = () => {
   const items = [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/cropvision', label: 'CropVision', icon: ScanLine },
+    { to: '/dashboard', label: 'Command', icon: LayoutDashboard },
+    { to: '/assistant', label: 'Pulse AI', icon: BotMessageSquare },
+    { to: '/cropvision', label: 'Vision', icon: ScanLine },
     { to: '/pulsewater', label: 'Water', icon: Droplets },
-    { to: '/assistant', label: 'Assistant', icon: BotMessageSquare },
-    { to: '/crops', label: 'My Crops', icon: Sprout },
+    { to: '/schemes', label: 'Schemes', icon: Landmark },
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 px-2 py-1.5 shadow-lg">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-noir-900/95 backdrop-blur-xl border-t border-noir-700/80 px-2 py-1.5 shadow-noir-card">
       <div className="grid grid-cols-5 gap-1">
         {items.map((item) => {
           const Icon = item.icon;
@@ -21,21 +21,21 @@ export const MobileNav: React.FC = () => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold transition ${
+                `flex flex-col items-center justify-center py-1 rounded-xl text-[10px] font-mono transition ${
                   isActive
-                    ? 'text-emerald-800'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'text-lime-accent font-bold'
+                    : 'text-ivory-400 hover:text-ivory-100'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   <div
-                    className={`p-1 rounded-lg mb-0.5 ${
-                      isActive ? 'bg-emerald-100 text-emerald-800' : ''
+                    className={`p-1 rounded-lg mb-0.5 transition ${
+                      isActive ? 'bg-lime-accent/15 text-lime-glow shadow-glow-lime' : ''
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-4 h-4" />
                   </div>
                   <span>{item.label}</span>
                 </>

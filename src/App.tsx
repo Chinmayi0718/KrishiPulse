@@ -7,6 +7,8 @@ import { DashboardPage } from './pages/DashboardPage';
 import { CropVisionPage } from './pages/CropVisionPage';
 import { PulseWaterPage } from './pages/PulseWaterPage';
 import { AssistantPage } from './pages/AssistantPage';
+import { SchemesPage } from './pages/SchemesPage';
+import { MandiPage } from './pages/MandiPage';
 import { WeatherPage } from './pages/WeatherPage';
 import { MyCropsPage } from './pages/MyCropsPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -16,7 +18,7 @@ export const App: React.FC = () => {
     <AppProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Marketing Landing Page */}
+          {/* Public Marketing Landing Page in Monsoon Noir */}
           <Route path="/" element={<LandingPage />} />
 
           {/* Farmer Portal Application Routes with Layout */}
@@ -25,6 +27,8 @@ export const App: React.FC = () => {
             <Route path="/cropvision" element={<CropVisionPage />} />
             <Route path="/pulsewater" element={<PulseWaterPage />} />
             <Route path="/assistant" element={<AssistantPage />} />
+            <Route path="/schemes" element={<SchemesPage />} />
+            <Route path="/mandi" element={<MandiPage />} />
             <Route path="/weather" element={<WeatherPage />} />
             <Route path="/crops" element={<MyCropsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
